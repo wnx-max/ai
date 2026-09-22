@@ -42,7 +42,8 @@ with sync_playwright() as p:
     page.screenshot(path=os.path.join(SCREENSHOT_DIR, "09_mobile_start.png"), full_page=True)
 
     # 验证统计数字正确
-    assert_true(page.locator("#stat-single").text_content() == "210", "单选题数量=210")
+    assert_true(page.locator("#stat-single").text_content() == "180", "单选题数量=180")
+    assert_true(page.locator("#stat-multi").text_content() == "30", "多选题数量=30")
     assert_true(page.locator("#stat-judge").text_content() == "90", "判断题数量=90")
     assert_true(page.locator("#stat-total").text_content() == "300", "总题数=300")
 
@@ -51,7 +52,7 @@ with sync_playwright() as p:
     page.locator("#start-btn").click()
     page.wait_for_timeout(300)
     assert_true(page.locator("#quiz-screen.active").is_visible(), "移动端答题页可见")
-    assert_true(page.locator("#quiz-counter").text_content() == "1 / 210", "计数器=1/210")
+    assert_true(page.locator("#quiz-counter").text_content() == "1 / 180", "计数器=1/180")
 
     page.screenshot(path=os.path.join(SCREENSHOT_DIR, "10_mobile_quiz.png"), full_page=True)
 
@@ -63,10 +64,10 @@ with sync_playwright() as p:
     log("===== 4. 移动端导航 =====")
     page.locator("#next-btn").click()
     page.wait_for_timeout(200)
-    assert_true(page.locator("#quiz-counter").text_content() == "2 / 210", "下一题计数器=2/210")
+    assert_true(page.locator("#quiz-counter").text_content() == "2 / 180", "下一题计数器=2/180")
     page.locator("#prev-btn").click()
     page.wait_for_timeout(200)
-    assert_true(page.locator("#quiz-counter").text_content() == "1 / 210", "返回第1题")
+    assert_true(page.locator("#quiz-counter").text_content() == "1 / 180", "返回第1题")
 
     log("===== 5. 移动端交卷 =====")
     # 注册一次 dialog 处理
@@ -83,7 +84,7 @@ with sync_playwright() as p:
     log("===== 6. 移动端解析 =====")
     page.locator("#review-btn").click()
     page.wait_for_timeout(500)
-    assert_true(page.locator(".review-item").count() == 210, "解析条目=210")
+    assert_true(page.locator(".review-item").count() == 180, "解析条目=180")
     page.screenshot(path=os.path.join(SCREENSHOT_DIR, "12_mobile_review.png"), full_page=True)
 
     browser.close()

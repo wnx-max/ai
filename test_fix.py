@@ -101,7 +101,7 @@ with sync_playwright() as p:
     page.wait_for_timeout(500)
 
     review_items = page.locator(".review-item")
-    assert_true(review_items.count() == 210, f"解析条目=210 (实际={review_items.count()})")
+    assert_true(review_items.count() == 180, f"解析条目=180 (实际={review_items.count()})")
 
     # 第114题是第114个解析项
     q114_review = review_items.nth(113)  # 0-indexed

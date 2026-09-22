@@ -50,15 +50,17 @@ with sync_playwright() as p:
 
     # 验证题目数量统计
     single_count = page.locator("#stat-single").text_content()
+    multi_count = page.locator("#stat-multi").text_content()
     judge_count = page.locator("#stat-judge").text_content()
     total_count = page.locator("#stat-total").text_content()
-    assert_true(single_count == "210", f"单选题数量=210 (实际={single_count})")
+    assert_true(single_count == "180", f"单选题数量=180 (实际={single_count})")
+    assert_true(multi_count == "30", f"多选题数量=30 (实际={multi_count})")
     assert_true(judge_count == "90", f"判断题数量=90 (实际={judge_count})")
     assert_true(total_count == "300", f"总题数=300 (实际={total_count})")
 
     # 验证筛选按钮
     filter_btns = page.locator(".filter-btn").all()
-    assert_true(len(filter_btns) == 3, f"3个筛选按钮 (实际={len(filter_btns)})")
+    assert_true(len(filter_btns) == 4, f"4个筛选按钮 (实际={len(filter_btns)})")
     shot(page, "01_start_screen")
 
     log("===== 2. 选择单选题库并开始 =====")
@@ -73,7 +75,7 @@ with sync_playwright() as p:
     assert_true("相关性分析" in q_text, f"第1题内容正确 (实际={q_text[:30]})")
 
     counter = page.locator("#quiz-counter").text_content()
-    assert_true(counter == "1 / 210", f"计数器=1/210 (实际={counter})")
+    assert_true(counter == "1 / 180", f"计数器=1/180 (实际={counter})")
 
     type_label = page.locator("#quiz-type-label").text_content()
     assert_true(type_label == "单选题", f"题型标签=单选题 (实际={type_label})")
@@ -97,7 +99,7 @@ with sync_playwright() as p:
     page.locator("#next-btn").click()
     page.wait_for_timeout(200)
     counter = page.locator("#quiz-counter").text_content()
-    assert_true(counter == "2 / 210", f"计数器=2/210 (实际={counter})")
+    assert_true(counter == "2 / 180", f"计数器=2/180 (实际={counter})")
     # 验证第1题答案被保留（回到第1题检查）
     page.locator("#prev-btn").click()
     page.wait_for_timeout(200)
@@ -116,7 +118,44 @@ with sync_playwright() as p:
     page.wait_for_timeout(300)
     assert_true(page.locator("#start-screen.active").is_visible(), "返回开始页")
 
-    log("===== 6. 测试判断题 - 切换到判断题库 =====")
+    log("===== 6. 测试多选题 - 切换到多选题库 =====")
+    page.locator(".filter-btn[data-type='multi']").click()
+    page.locator("#start-btn").click()
+    page.wait_for_timeout(300)
+
+    type_label = page.locator("#quiz-type-label").text_content()
+    assert_true(type_label == "多选题", f"多选题标签 (实际={type_label})")
+
+    counter = page.locator("#quiz-counter").text_content()
+    assert_true(counter == "1 / 30", f"多选题计数器=1/30 (实际={counter})")
+
+    q_text = page.locator("#question-text").text_content()
+    assert_true("职业道德" in q_text, f"多选第1题内容 (实际={q_text[:30]})")
+    shot(page, "03_multi_question")
+
+    # 测试多选：选A、B、D（第1题正确答案）
+    page.locator(".option-item[data-letter='A']").click()
+    page.locator(".option-item[data-letter='B']").click()
+    page.locator(".option-item[data-letter='D']").click()
+    page.wait_for_timeout(200)
+    selected = page.locator(".option-item.selected").count()
+    assert_true(selected == 3, f"多选选中3个 (实际={selected})")
+
+    # 测试取消选择
+    page.locator(".option-item[data-letter='B']").click()
+    page.wait_for_timeout(200)
+    selected = page.locator(".option-item.selected").count()
+    assert_true(selected == 2, f"取消后选中2个 (实际={selected})")
+    # 重新选回B
+    page.locator(".option-item[data-letter='B']").click()
+    page.wait_for_timeout(200)
+
+    # 返回开始页
+    page.locator("#back-btn").click()
+    page.wait_for_timeout(300)
+    assert_true(page.locator("#start-screen.active").is_visible(), "返回开始页")
+
+    log("===== 7. 测试判断题 - 切换到判断题库 =====")
     page.locator(".filter-btn[data-type='judge']").click()
     page.locator("#start-btn").click()
     page.wait_for_timeout(300)

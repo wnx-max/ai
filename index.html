@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 数据处理刷题应用</title>
+    <title>人工智能训练师刷题应用</title>
     <style>
         /* ===== 全局重置与变量 ===== */
         :root {
@@ -613,6 +613,38 @@
             gap: 14px;
         }
 
+        /* ===== 回到顶部悬浮按钮（解析页） ===== */
+        .back-top-btn {
+            position: fixed;
+            right: 24px;
+            bottom: 32px;
+            z-index: 90;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary);
+            color: #fff;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(31, 58, 147, 0.35);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(8px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .back-top-btn.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .back-top-btn:hover {
+            background: var(--primary-dark);
+        }
+
         .review-item {
             background: var(--bg-card);
             border-radius: var(--radius);
@@ -858,8 +890,12 @@
                 <p class="app-subtitle">数据标注 · 数据清洗 · 机器学习 · 职业素养题库</p>
                 <div class="stats-row">
                     <div class="stat-item">
-                        <span class="stat-num" id="stat-single">210</span>
+                        <span class="stat-num" id="stat-single">180</span>
                         <span class="stat-label">单选题</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-num" id="stat-multi">30</span>
+                        <span class="stat-label">多选题</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-num" id="stat-judge">90</span>
@@ -875,6 +911,7 @@
                     <div class="filter-buttons">
                         <button class="filter-btn active" data-type="all">全部题目</button>
                         <button class="filter-btn" data-type="single">单选题</button>
+                        <button class="filter-btn" data-type="multi">多选题</button>
                         <button class="filter-btn" data-type="judge">判断题</button>
                     </div>
                 </div>
@@ -950,6 +987,8 @@
             </div>
 
             <div id="review-list" class="review-list hidden"></div>
+
+            <button id="back-top-btn" class="back-top-btn" title="回到顶部" aria-label="回到顶部">↑</button>
         </section>
     </div>
 
@@ -963,7 +1002,7 @@
         // type: single=单选, multi=多选, judge=判断
         // answer: 单选/判断为单字母字符串；多选为字母数组
         const QUESTIONS = [
-            /* ===== 单选题 1-210 ===== */
+            /* ===== 单选题 1-180 + 多选题 1-30（多选题穿插在原文件相应位置） ===== */
             { type: 'single', stem: '在数据分析中，相关性分析用于（）。', options: ['预测数据点的值', '计算数据的分布', '评估变量之间的因果关系', '确定变量的类型'], answer: 'C' },
             { type: 'single', stem: '在算法测试中，测试结果的分析通常不包括（）。', options: ['模型的可解释性', '模型的预测能力', '模型的市场占有率', '模型的性能指标'], answer: 'C' },
             { type: 'single', stem: '在数据清理中，处理缺失值的以下方法中，哪种是用某个特征的均值来填充缺失值（）。', options: ['用中位数填充', '删除含有缺失值的行', '用众数填充', '用均值填充'], answer: 'D' },
@@ -1144,36 +1183,36 @@
             { type: 'single', stem: '语音识别系统的主要挑战之一是（）。', options: ['语音合成的速度', '语音的歧义性和多样性', '低功耗设计', '实时处理能力'], answer: 'B' },
             { type: 'single', stem: '构建实践教学体系的基本原则有（）。', options: ['实用型原则', '特色性原则', '混合型原则', '理论性原则'], answer: 'A' },
             { type: 'single', stem: '在进行优化成效验证时，（）指标最能反映模型在实际应用中的表现。', options: ['收敛速度', '精度与召回率', '测试准确率', '训练误差'], answer: 'B' },
-            { type: 'single', stem: '企业在培养员工职业道德时，应注重哪些方面（）。', options: ['遵守法律法规', '团队合作', '追求个人利益最大化', '诚实守信'], answer: 'D' },
-            { type: 'single', stem: '划分数据集时，以下（）因素需要考虑。', options: ['数据量的大小', '模型的复杂度', '硬件的计算能力', '数据分布的平衡性'], answer: 'D' },
-            { type: 'single', stem: '数据变换可以包括以下哪些方法?', options: ['对数变换', '标准化', '离散化', '主成分分析'], answer: 'D' },
-            { type: 'single', stem: '在图像处理领域，以下哪些操作是常见的图像增强技术?', options: ['边缘检测', '调整亮度和对比度', '噪声降低', '色彩校正'], answer: 'D' },
-            { type: 'single', stem: '数据采集过程中的异常处理包括哪些方面（）。', options: ['识别异常数据', '记录异常情况', '采取纠正措施', '忽略异常数据'], answer: 'C' },
-            { type: 'single', stem: '在大数据技术中，以下哪些是用于提高数据处理效率的技术', options: ['数据分区', '内存计算', '云计算资源动态扩展', '多线程处理'], answer: 'D' },
-            { type: 'single', stem: '算法复杂性常用（）进行分析。', options: ['数据集', '空间复杂度', '时间复杂度', '资源大小'], answer: 'C' },
-            { type: 'single', stem: '具备工匠精神的员工通常具备哪些特质（）。', options: ['对工作有热情', '对质量有高标准', '追求快速完成任务', '持续创新和改进'], answer: 'D' },
-            { type: 'single', stem: '以下哪些因素会影响算法测试结果的准确性（）。', options: ['测试数据的质量', '测试执行的随机性', '算法的实现细节', '测试用例的覆盖率'], answer: 'D' },
-            { type: 'single', stem: '根据表现形式，用户界面包括（）。', options: ['自适应界面', '图形界面', '自然用户界面', '命令行界面'], answer: 'D' },
-            { type: 'single', stem: '以下哪些是标注过程中可能考虑的标注属性（）。', options: ['颜色信息', '位置信息', '纹理信息', '大小信息'], answer: 'D' },
-            { type: 'single', stem: '在业务数据审核中，以下（）技术可以提高数据审核的效率。', options: ['使用随机抽样技术验证数据质量', '完全依赖人工手动检查数据', '构建审计日志跟踪数据变更', '使用人工智能进行自动审核'], answer: 'D' },
-            { type: 'single', stem: '视觉类数据标注规则应包括以下（）。', options: ['忽略数据分布的均衡性', '标注工具的使用说明', '处理模糊或遮挡目标的规则', '标签类别定义清晰'], answer: 'D' },
-            { type: 'single', stem: '以下哪些方法可以用于时间序列数据的特征构造（）。', options: ['傅里叶变换', '小波变换', '特征删除', '滑动窗口技术'], answer: 'D' },
-            { type: 'single', stem: '在特征选择过程中，以下哪些方法可以有效提高模型的性能和可解释性（）。', options: ['信息增益', '递归特征消除', '随机森林的特征重要性评估', '主成分分析'], answer: 'D' },
-            { type: 'single', stem: '以下哪些措施有助于提高数据标注规则的执行效率（）。', options: ['进行规则培训', '增加标注任务的报酬', '实施规则审核机制', '提供详细的规则说明'], answer: 'D' },
-            { type: 'single', stem: '在数据标注项目中，以下哪些措施是确保标注质量的关键控制方法（）。', options: ['实施标注结果的随机抽样和全面审核', '对标注员进行定期的技能培训和测试', '制定和遵循详细的标注指南', '采用自动化工具辅助检测标注错误'], answer: 'D' },
-            { type: 'single', stem: '对于需要模型在特征空间中直接度量样本间相似度或距离的任务(如度量学习和人脸识别)，下列（）损失函数往往更适合。', options: ['L2 Loss(MSE)', 'Contrastive Loss', 'Triplet Loss', 'Hinge Loss'], answer: 'C' },
-            { type: 'single', stem: '为了提高数据标注的准确性，可以采取哪些措施（）。', options: ['增加标注员之间的讨论', '定期进行标注员之间的交叉验证', '增加标注员工作时间', '使用先进的标注工具'], answer: 'D' },
-            { type: 'single', stem: '混合模式在哪些情况下可能更为有效（）。', options: ['标注任务具有高度复杂性时', '需要快速迭代模型时', '数据集非常大且多样化时', '数据质量要求极高时'], answer: 'C' },
-            { type: 'single', stem: '在指定数据标注规则时，以下哪些因素是重要的（）。', options: ['规则应简洁明了，避免冗长', '规则应具有一定的灵活性', '规则应覆盖所有可能的数据情况', '确保规则的可理解性'], answer: 'D' },
-            { type: 'single', stem: '在机器学习中，以下哪些因素可能影响模型的泛化能力（）。', options: ['模型的复杂度', '训练数据的多样性', '模型的欠拟合', '模型的过拟合'], answer: 'D' },
-            { type: 'single', stem: '在进行数据分析工作时，哪些策略能够有效提升分析工作的效率（）。', options: ['采用高级统计软件进行复杂的数据分析', '使用自动化工具来处理数据预处理步骤', '手动检查每一条数据以确保数据质量', '通过数据可视化快速识别数据中的模式和趋势'], answer: 'D' },
-            { type: 'single', stem: '以下哪些措施有助于提高模型的泛化能力（）。', options: ['减少特征数量', '早停法', '应用集成学习方法', '使用更复杂的模型'], answer: 'C' },
-            { type: 'single', stem: '在数据清洗过程中，以下哪些属于异常数据处理的方法（）。', options: ['替换异常值', '使用模型预测异常值', '保留异常值进行标记', '删除异常值'], answer: 'D' },
-            { type: 'single', stem: '在数据标注质量检验领域，以下哪些方法可以用于评估标注的质量（）。', options: ['交叉验证', '错误率分析', '标注结果的统计分析', '一致性检验'], answer: 'D' },
-            { type: 'single', stem: '以下（）会导致语音类业务数据出现失真。', options: ['网络拥塞', '设备故障', '强磁场干扰', '语音编码算法缺陷'], answer: 'D' },
-            { type: 'single', stem: '在数据预处理中，以下哪些技术是常用的（）。', options: ['特征选择', '数据标准化', '数据丢失', '数据归一化'], answer: 'D' },
-            { type: 'single', stem: '为了确保数据采集的完整性，可以采取以下哪些措施（）。', options: ['增加数据采集点', '减少人为干预', '使用自动化采集系统', '实施数据采集监控'], answer: 'D' },
-            { type: 'single', stem: '在大数据采集中，以下哪些措施可以提高数据质量（）。', options: ['实施数据监控', '定期进行数据审核', '限制数据来源', '使用数据校验机制'], answer: 'D' },
+            { type: 'multi', stem: '企业在培养员工职业道德时，应注重哪些方面（）。', options: ['遵守法律法规', '团队合作', '追求个人利益最大化', '诚实守信'], answer: ['A','B','D'] },
+            { type: 'multi', stem: '划分数据集时，以下（）因素需要考虑。', options: ['数据量的大小', '模型的复杂度', '硬件的计算能力', '数据分布的平衡性'], answer: ['A','B','D'] },
+            { type: 'multi', stem: '数据变换可以包括以下哪些方法?', options: ['对数变换', '标准化', '离散化', '主成分分析'], answer: ['A','B','C','D'] },
+            { type: 'multi', stem: '在图像处理领域，以下哪些操作是常见的图像增强技术?', options: ['边缘检测', '调整亮度和对比度', '噪声降低', '色彩校正'], answer: ['B','C','D'] },
+            { type: 'multi', stem: '数据采集过程中的异常处理包括哪些方面（）。', options: ['识别异常数据', '记录异常情况', '采取纠正措施', '忽略异常数据'], answer: ['A','B','C'] },
+            { type: 'multi', stem: '在大数据技术中，以下哪些是用于提高数据处理效率的技术', options: ['数据分区', '内存计算', '云计算资源动态扩展', '多线程处理'], answer: ['A','B','C','D'] },
+            { type: 'multi', stem: '算法复杂性常用（）进行分析。', options: ['数据集', '空间复杂度', '时间复杂度', '资源大小'], answer: ['B','C'] },
+            { type: 'multi', stem: '具备工匠精神的员工通常具备哪些特质（）。', options: ['对工作有热情', '对质量有高标准', '追求快速完成任务', '持续创新和改进'], answer: ['A','B','D'] },
+            { type: 'multi', stem: '以下哪些因素会影响算法测试结果的准确性（）。', options: ['测试数据的质量', '测试执行的随机性', '算法的实现细节', '测试用例的覆盖率'], answer: ['A','B','C','D'] },
+            { type: 'multi', stem: '根据表现形式，用户界面包括（）。', options: ['自适应界面', '图形界面', '自然用户界面', '命令行界面'], answer: ['B','C','D'] },
+            { type: 'multi', stem: '以下哪些是标注过程中可能考虑的标注属性（）。', options: ['颜色信息', '位置信息', '纹理信息', '大小信息'], answer: ['A','B','C','D'] },
+            { type: 'multi', stem: '在业务数据审核中，以下（）技术可以提高数据审核的效率。', options: ['使用随机抽样技术验证数据质量', '完全依赖人工手动检查数据', '构建审计日志跟踪数据变更', '使用人工智能进行自动审核'], answer: ['A','C','D'] },
+            { type: 'multi', stem: '视觉类数据标注规则应包括以下（）。', options: ['忽略数据分布的均衡性', '标注工具的使用说明', '处理模糊或遮挡目标的规则', '标签类别定义清晰'], answer: ['B','C','D'] },
+            { type: 'multi', stem: '以下哪些方法可以用于时间序列数据的特征构造（）。', options: ['傅里叶变换', '小波变换', '特征删除', '滑动窗口技术'], answer: ['A','B','D'] },
+            { type: 'multi', stem: '在特征选择过程中，以下哪些方法可以有效提高模型的性能和可解释性（）。', options: ['信息增益', '递归特征消除', '随机森林的特征重要性评估', '主成分分析'], answer: ['A','B','C'] },
+            { type: 'multi', stem: '以下哪些措施有助于提高数据标注规则的执行效率（）。', options: ['进行规则培训', '增加标注任务的报酬', '实施规则审核机制', '提供详细的规则说明'], answer: ['A','C','D'] },
+            { type: 'multi', stem: '在数据标注项目中，以下哪些措施是确保标注质量的关键控制方法（）。', options: ['实施标注结果的随机抽样和全面审核', '对标注员进行定期的技能培训和测试', '制定和遵循详细的标注指南', '采用自动化工具辅助检测标注错误'], answer: ['A','B','C','D'] },
+            { type: 'multi', stem: '对于需要模型在特征空间中直接度量样本间相似度或距离的任务(如度量学习和人脸识别)，下列（）损失函数往往更适合。', options: ['L2 Loss(MSE)', 'Contrastive Loss', 'Triplet Loss', 'Hinge Loss'], answer: ['B','C'] },
+            { type: 'multi', stem: '为了提高数据标注的准确性，可以采取哪些措施（）。', options: ['增加标注员之间的讨论', '定期进行标注员之间的交叉验证', '增加标注员工作时间', '使用先进的标注工具'], answer: ['A','B','D'] },
+            { type: 'multi', stem: '混合模式在哪些情况下可能更为有效（）。', options: ['标注任务具有高度复杂性时', '需要快速迭代模型时', '数据集非常大且多样化时', '数据质量要求极高时'], answer: ['A','C','D'] },
+            { type: 'multi', stem: '在指定数据标注规则时，以下哪些因素是重要的（）。', options: ['规则应简洁明了，避免冗长', '规则应具有一定的灵活性', '规则应覆盖所有可能的数据情况', '确保规则的可理解性'], answer: ['A','B','C','D'] },
+            { type: 'multi', stem: '在机器学习中，以下哪些因素可能影响模型的泛化能力（）。', options: ['模型的复杂度', '训练数据的多样性', '模型的欠拟合', '模型的过拟合'], answer: ['A','B','C','D'] },
+            { type: 'multi', stem: '在进行数据分析工作时，哪些策略能够有效提升分析工作的效率（）。', options: ['采用高级统计软件进行复杂的数据分析', '使用自动化工具来处理数据预处理步骤', '手动检查每一条数据以确保数据质量', '通过数据可视化快速识别数据中的模式和趋势'], answer: ['A','B','D'] },
+            { type: 'multi', stem: '以下哪些措施有助于提高模型的泛化能力（）。', options: ['减少特征数量', '早停法', '应用集成学习方法', '使用更复杂的模型'], answer: ['A','B','C'] },
+            { type: 'multi', stem: '在数据清洗过程中，以下哪些属于异常数据处理的方法（）。', options: ['替换异常值', '使用模型预测异常值', '保留异常值进行标记', '删除异常值'], answer: ['A','B','C','D'] },
+            { type: 'multi', stem: '在数据标注质量检验领域，以下哪些方法可以用于评估标注的质量（）。', options: ['交叉验证', '错误率分析', '标注结果的统计分析', '一致性检验'], answer: ['A','B','C','D'] },
+            { type: 'multi', stem: '以下（）会导致语音类业务数据出现失真。', options: ['网络拥塞', '设备故障', '强磁场干扰', '语音编码算法缺陷'], answer: ['A','B','C','D'] },
+            { type: 'multi', stem: '在数据预处理中，以下哪些技术是常用的（）。', options: ['特征选择', '数据标准化', '数据丢失', '数据归一化'], answer: ['A','B','D'] },
+            { type: 'multi', stem: '为了确保数据采集的完整性，可以采取以下哪些措施（）。', options: ['增加数据采集点', '减少人为干预', '使用自动化采集系统', '实施数据采集监控'], answer: ['A','C','D'] },
+            { type: 'multi', stem: '在大数据采集中，以下哪些措施可以提高数据质量（）。', options: ['实施数据监控', '定期进行数据审核', '限制数据来源', '使用数据校验机制'], answer: ['A','B','D'] },
 
             /* ===== 判断题 1-90 ===== */
             { type: 'judge', stem: '一味地降低训练误差意味着泛化误差一定会降低。', options: ['正确', '错误'], answer: 'B' },
@@ -1336,9 +1375,11 @@
         function initStartScreen() {
             const counts = {
                 single: QUESTIONS.filter(q => q.type === 'single').length,
+                multi: QUESTIONS.filter(q => q.type === 'multi').length,
                 judge: QUESTIONS.filter(q => q.type === 'judge').length,
             };
             $('stat-single').textContent = counts.single;
+            $('stat-multi').textContent = counts.multi;
             $('stat-judge').textContent = counts.judge;
             $('stat-total').textContent = QUESTIONS.length;
 
@@ -1684,6 +1725,19 @@
             $('restart-btn').addEventListener('click', () => {
                 showScreen('start');
             });
+
+            // 回到顶部按钮：仅在解析页可见且向下滚动超过 300px 时显示
+            $('back-top-btn').addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            window.addEventListener('scroll', () => {
+                const onResult = screens.result.classList.contains('active');
+                const reviewShown = !$('review-list').classList.contains('hidden');
+                $('back-top-btn').classList.toggle(
+                    'show',
+                    onResult && reviewShown && window.scrollY > 300
+                );
+            }, { passive: true });
 
             // 键盘快捷键（PC 端）
             document.addEventListener('keydown', (e) => {
